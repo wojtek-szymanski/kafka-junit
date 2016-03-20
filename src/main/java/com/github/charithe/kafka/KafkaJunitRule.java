@@ -44,6 +44,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -272,17 +273,21 @@ public class KafkaJunitRule extends ExternalResource {
         ExecutorService singleThread = Executors.newSingleThreadExecutor();
         try {
             consumer.subscribe(Lists.newArrayList(topic));
-            Future<List<T>> future = singleThread.submit(() -> {
-                                                             List<T> messages = new ArrayList<>(expectedMessages);
-                                                             while (messages.size() < expectedMessages) {
-                                                                 ConsumerRecords<T, T> records = consumer.poll(POLL_TIMEOUT_MS);
-                                                                 for (ConsumerRecord<T, T> rec : records) {
-                                                                     LOGGER.debug("Received message: {} -> {}", rec.key(), rec.value());
-                                                                     messages.add(rec.value());
-                                                                 }
-                                                             }
-                                                             return messages;
-                                                         }
+            Future<List<T>> future = singleThread.submit(
+                    new Callable<List<T>>() {
+                        @Override
+                        public List<T> call() throws Exception {
+                            List<T> messages = new ArrayList<>(expectedMessages);
+                            while (messages.size() < expectedMessages) {
+                                ConsumerRecords<T, T> records = consumer.poll(POLL_TIMEOUT_MS);
+                                for (ConsumerRecord<T, T> rec : records) {
+                                    LOGGER.debug("Received message: {} -> {}", rec.key(), rec.value());
+                                    messages.add(rec.value());
+                                }
+                            }
+                            return messages;
+                        }
+                    }
             );
 
             return future.get(timeoutSeconds, SECONDS);

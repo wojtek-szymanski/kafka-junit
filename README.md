@@ -3,15 +3,16 @@ Kafka JUnit Rule [![Build Status](https://travis-ci.org/charithe/kafka-junit.svg
 
 JUnit rule for starting and tearing down a Kafka broker during tests.
 
-Version | Kafka Version 
---------|---------------
-1.6     | 0.8.2.1       
-1.7     | 0.8.2.2       
-1.8     | 0.9.0.0  
-2.0     | 0.9.0.1
+Version | Kafka Version | JDK Version
+--------|---------------|-------------
+1.6     | 0.8.2.1       | 7
+1.7     | 0.8.2.2       | 7
+1.8     | 0.9.0.0       | 7
+1.9.1   | 0.9.0.1       | 7
+2.0     | 0.9.0.1       | 8
 
 
-Please note that version 2.0 is for Java 1.8 and up and contains some breaking API changes.
+Please note that version 1.9.1 contains some breaking API changes.
 
 Installation
 -------------
